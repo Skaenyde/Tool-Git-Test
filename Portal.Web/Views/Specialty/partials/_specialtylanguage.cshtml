@@ -1,0 +1,103 @@
+﻿@model Portal.Common.ViewModels.SpecialtyLanguageViewModel
+@using Portal.Common.Enums
+
+@section scripts{
+    <script type="text/javascript">
+
+    </script>
+}
+
+
+
+
+@*<input asp-for="SpecialtyDemographics.SpecialtyId" />*@
+<input asp-for="SpecialtyLanguage.SpecialtyLanguageId" id="hiddenSpecialtyLanguageId" />
+
+
+
+<div class="container" id="SpecialtyLanguage">
+
+    <!-- begin::Specialty Language title-->
+    <div class="row">
+        <h3 class="anchor fw-bolder mb-5" id="directory-section">
+         @(Model.ActionType == ActionType.Edit ? "Edit Specialty Display Name" : "New Specialty Display Name") 
+        </h3>
+    </div><!-- end::Specialty Language title-->
+
+    <div class="row">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div id="SpecialtyLanguageSqlError" class="kt-margin-b-20 text-danger col-lg-12"></div>
+        <div id="errorNoteSpecialtyLanguage" class="col-lg-12 kt-margin-b-20"></div>
+    </div>
+
+    <!-- begin::1st row controllers-->
+    <div class="row">
+        <div class="col fv-row">
+            <label for="ddlSpecialtyLanguage"> Specialty Language </label>
+            <select id="ddlSpecialtyLanguage" asp-for="SpecialtyLanguage.LanguageId" asp-items="Model.SelectLanguages" name="SpecialtyLanguage" class="form-control form-select" disabled="@(Model.ActionType == ActionType.Add ? null : "disabled")">
+                <option disabled></option>
+            </select>
+         </div>
+        <div class="col fv-row">
+            <label for="ddlSpecialtyLanguageLob">Line of Business</label>
+            <select id="ddlSpecialtyLanguageLob" asp-for="SpecialtyLanguage.LineOfBusinessId" asp-items="Model.SelectLineOfBusinesses" name="SpecialtyLoB" class="form-control form-select" disabled="@(Model.ActionType == ActionType.Add ? null : "disabled")">
+                <option disabled></option>
+            </select>
+        </div>
+        <div class="col fv-row">
+            <label for="ddlSpecialtyLanguageCompany"> Company </label>
+            <select id="ddlSpecialtyLanguageCompany" asp-for="SpecialtyLanguage.CompanyId" asp-items="Model.SelectCompanies" name="SpecialtyCompany" class="form-control form-select" disabled="@(Model.ActionType == ActionType.Add ? null : "disabled")">
+                <option disabled></option>
+            </select>
+            <span class="form-text text-muted">Select Line of Business first.</span>
+        </div>
+    </div><!-- end::1st row controllers-->
+    
+    <!-- begin::2nd row controllers-->
+    <div class="row">
+        <div class="col fv-row">
+            <label>Display Name</label>
+            <input id="txtSpecialtyLanguageDisplayName" type="text" class="form-control" name="SpecialtyDisplayName" asp-for="SpecialtyLanguage.DisplayName" disabled="@(Model.ActionType == ActionType.Add ? null : "disabled")">
+        </div>
+        <div class="col fv-row">
+            <label for="dateSpecialtyLanguageEffective">Effective Date</label>
+            <input asp-for="SpecialtyLanguage.EffectiveDate" class="form-control" type="date" name="SpecialtyEffectiveDate" id="dateSpecialtyLanguageEffective"  disabled="@(Model.ActionType == ActionType.Add ? null : "disabled")" >
+        </div>
+        <div class="col fv-row">
+            <label for="dateSpecialtyLanguageEnd">End Date</label>
+            <input asp-for="SpecialtyLanguage.EndDate" class="form-control" name="SpecialtyEndDate" type="date" id="dateSpecialtyLanguageEnd"  disabled="@(Model.User.ModulePermission == PermissionType.edit ? null : "disabled")">
+        </div>
+    </div><!-- end::2nd row controllers-->
+
+    <!-- begin::Footer-->
+    <div class="row">
+        <div class="col d-flex justify-content-end align-items-center">
+            <span class="kt-margin-left-right">
+                <a id="btnSpecialtyLanguageCancel" class="kt-link kt-font-bold">Cancel</a>
+            </span>
+
+            @{
+                if (Model.User.ModulePermission == PermissionType.edit)
+                {
+                    <a> &nbsp; or &nbsp; </a>
+                    if (Model.ActionType == ActionType.Edit)
+                        {
+                            <a id="btnSaveSpecialtyLanguage" class="btn btn-primary btn-sm">
+                                <i class="la la-check"></i>
+                                <span class="kt-hidden-mobile" style="color:white;">Save</span>
+                            </a>
+                        }
+                    else
+                        {
+                            <button type="button" id="btnAddSpecialtyLanguage" class="btn btn-primary btn-sm">
+                                <span class="kt-hidden-mobile" style="color:white;">Add</span>
+                            </button>
+                        }
+                }
+            }
+        </div>
+        
+
+    </div><!-- begin::Footer-->
+
+</div>

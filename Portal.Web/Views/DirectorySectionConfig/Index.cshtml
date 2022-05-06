@@ -1,0 +1,417 @@
+﻿@model Portal.Common.ViewModels.DirectorySectionViewModel
+
+
+@section css{
+    <link href="~/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css">
+
+}
+
+@section vendors {
+    <script src="~/assets/plugins/custom/datatables/datatables.bundle.js" type="text/javascript"></script>
+}
+
+@section scripts{
+    <script src="~/js/datatables/DirectorySectionConfig-Datatable.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        // New Modal JavaScript--------------------------------------------------------------------------------
+
+        //Validation variables
+        //Get that Form.
+        const newModalform = document.getElementById('formNewDirectorySection');
+
+        var newModalValidator = FormValidation.formValidation(
+            newModalform,
+            {
+                fields: {
+                    'NewDirectorySectionName': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Name is required'
+                            }
+                        }
+                    },
+                    'NewDirectorySectionDescription': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Description is required'
+                            }
+                        }
+                    },
+                    'NewDirectorySectionCode': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Code is required'
+                            }
+                        }
+                    },
+                },
+
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',
+                        eleValidClass: ''
+                    })
+                }
+            }
+        );
+
+        // New Modal: Button Save.
+        $("#btnCreateNewDirectorySection").click(function () {  // capture the click
+            if (newModalValidator) {
+                newModalValidator.validate().then(function (status) {
+                    console.log('validated!');
+
+                    if (status == 'Valid') {
+                        $.ajax({
+                            url: '../../DirectorySectionConfig/CreateDirectorySection/',
+                            data: {
+                                directorySectionName: $('#txtNewDirectorySectionName').val(),
+                                directorySectionDescription: $('#txtNewDirectorySectionDescription').val(),
+                                directorySectionCode: $('#txtNewDirectorySectionCode').val(),
+                                paper: $('input[type=checkbox][name=chkNewPaper]:checked').val(),
+                                online: $('input[type=checkbox][name=chkNewOnline]:checked').val()
+                            },
+                            type: 'POST',
+                            success: function (result) {
+                                $("#modal_NewDirectorySection").modal('hide');
+                                location.reload(true);
+                            },
+                            error: function (xhr) {
+
+                                $('#DirectorySectionSqlError').show();
+                                $("#DirectorySectionSqlError").html(''); //Clear existing SQL error  messages.
+                                $("#DirectorySectionSqlError").append(xhr.responseText);
+                                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('Invalid Form!');
+                    }
+                });
+            }
+
+        });
+
+        // New modal: Cancel Button
+        $("#btnCancelCreateNewDirectorySection").click(function () {  // capture the click
+            //$("#formNewDirectorySection").validate().resetForm();
+            newModalValidator.resetForm();
+            
+
+            $("#modal_NewDirectorySection").modal('hide');
+        });
+
+
+        // Edit Modal JavaScript--------------------------------------------------------------------------------
+        // Edit Modal: Update button.
+        $("#btnUpdateDirectorySection").click(function () {  // capture the click
+            $.ajax({
+                url: '../../DirectorySectionConfig/UpdateDirectorySection/',
+                data: {
+                    directorySectionId: $('#hidDirectorySectionId').val(),
+                    directorySectionName: $('#txtEditDirectorySectionName').val(),
+                    directorySectionDescription: $('#txtEditDirectorySectionDescription').val(),
+                    directorySectionCode: $('#txtEditDirectorySectionCode').val(),
+                    paper: $('input[type=checkbox][name=chkEditPaper]:checked').val(),
+                    online: $('input[type=checkbox][name=chkEditOnline]:checked').val(),
+                    disable: $('input[type=checkbox][name=chkDisable]:checked').val()
+                },
+                type: 'POST',
+                success: function (result) {
+                    location.reload(true);
+                },
+                error: function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                }
+            });
+        });
+
+        // Edit Modal: Cancel
+        $("#btnCancelUpdateDirectorySection").click(function () {
+            $("#modal_EditDirectorySection").modal('hide');
+        });
+
+    </script>
+}
+
+
+<!--begin::Content-->
+<div class="card mb-2">
+    <!--begin::Card Body-->
+    <div class="card-body fs-6 py-15 px-10 py-lg-15 px-lg-15 text-gray-700">
+        <!--begin::Section-->
+        <div class="py-0">
+            <!--begin::Page Title-->
+            <div class="container px-0">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <h1 class="anchor fw-bolder mb-5" id="provider-directory">
+                            <a href="#provider-directory"></a>
+                            Directory Section Config
+                        </h1>
+                    </div>
+
+                    <div class="col d-flex justify-content-end">
+                        <button type="button" class="btn btn-outline-success btn-sm kt-margin-l-20" data-bs-toggle="modal" data-bs-target="#modal_NewDirectorySection">Add New</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--end::Page Title-->
+
+            <!--begin::Block-->
+            <div class="py-5">
+                <!--begin::Card-->
+                <div class="card card-p-0 card-flush">
+                    <!--begin::Card body-->
+                    <div class="card-body">
+                        <!--begin::Datatable-->
+                        <div class="my-5 border rounded">
+                            <table class="table table-striped gy-5 gs-7" id="dtDirectorySectionConfig">
+                                <thead>
+                                    <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase">
+                                        <th class=""> </th>
+                                        <th class="min-w-100px pe-5">Name</th>
+                                        <th class="min-w-100px pe-5">Description</th>
+                                        <th class="min-w-100px pe-5">Code</th>
+                                        <th class="min-w-100px pe-5">Online</th>
+                                        <th class="min-w-100px pe-5">Paper</th>
+                                        <th class="min-w-100px pe-5">Update Date</th>
+                                        <th class="min-w-100px pe-5">Update By</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!--end::Datatable-->
+                    </div>
+                    <!--end::Card body-->
+                </div>
+                <!--end::Card-->
+            </div>
+            <!--end::Block-->
+        </div>
+        <!--end::Section-->
+    </div>
+    <!--end::Card Body-->
+</div>
+<!--end::Content-->
+
+
+<!-- NEW MODAL: New Directory Section -->
+
+<div class="modal fade" tabindex="-1" id="modal_NewDirectorySection">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formNewDirectorySection" method="post" class="form" action="#" autocomplete="off">
+                    @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row">
+                            <div id="DirectorySectionSqlError" class="kt-margin-b-20 text-danger col-lg-12"></div>
+                            <div id="errorNoteNewDirectorySection" class="col-lg-12 kt-margin-b-20"></div>
+                        </div>*@
+                    @*<input id="hidRoleCompanyAccessId" asp-for="Edit.DirectorySectionId" type="hidden" />*@
+
+                <div class="modal-header">
+                    <h5 class="modal-title">New Directory Section</h5>
+
+                    <!--begin::Close-->
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="svg-icon svg-icon-2x"></span>
+                    </div>
+                    <!--end::Close-->
+                </div>
+                    <div class="modal-body">
+                            <!-- Directory Section Name-->
+                            <div class="row fv-row mb-5">
+                                <div class="col-lg-1"></div>
+                                <label class="col-lg-3 col-form-label">Name:</label>
+                                <div class=" col-lg-6">
+                                    <input id="txtNewDirectorySectionName" name="NewDirectorySectionName" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Directory Section Description-->
+                            <div class="row fv-row mb-5">
+                                <div class="col-lg-1"></div>
+
+                                <label class="col-lg-3 col-form-label">Description:</label>
+                                <div class=" col-lg-6">
+                                    <input id="txtNewDirectorySectionDescription" name="NewDirectorySectionDescription" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Directory Section Code-->
+                            <div class="row fv-row mb-5">
+                                <div class="col-lg-1"></div>
+                                <label class="col-lg-3 col-form-label">Code:</label>
+                                <div class=" col-lg-6">
+                                    <input id="txtNewDirectorySectionCode" name="NewDirectorySectionCode" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Effective Date-->
+                            @*<div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Effective Date:</label>
+                                <div class=" col-lg-6">
+                                    <div class="input-group date">
+                                        <input type="text" class="form-control" name="NewDirectorySectionEffectiveDate"  placeholder="Select date" readonly id="dateNewDirectorySectionEffectiveDate" required />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="la la-calendar-check-o"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="form-text text-muted"></span>
+                                </div>
+                            </div>*@
+
+                            <!-- Checkboxes: Directory Type -->
+                            <div class="row fv-row mb-5">
+                                <label class="col-lg-1"></label>
+                                <div class="col-lg-3">Type: </div>
+                                <div class="col-lg-2">
+                                    <div class="kt-checkbox-single">
+                                        <label class="kt-checkbox kt-checkbox--bold">
+                                            <input id="chkNewOnline" name="chkNewOnline" type="checkbox" asp-for="chkNewOnline"/>
+                                            Online
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                    <span class="form-text text-muted"></span>
+
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="kt-checkbox-single">
+                                        <label class="kt-checkbox kt-checkbox--bold">
+                                            <input id="chkNewPaper" name="chkNewPaper" type="checkbox" asp-for="chkNewPaper" />
+                                            Paper
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                    <span class="form-text text-muted"></span>
+                                </div>
+                                <div class="col-lg-6">
+                                </div>
+                            </div>
+                    </div>
+
+                <div class="modal-footer">
+                    <a id="btnCreateNewDirectorySection" class="btn btn-success">
+                        <span class="kt-hidden-mobile" style="color:white;">Save</span>
+                    </a>
+                    <span class="kt-margin-left-right">
+                        <a id="btnCancelCreateNewDirectorySection" class="btn btn-secondary">Cancel</a>
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- NEW MODAL: Edit Directory Section-->
+<div class="modal fade" tabindex="-1" id="modal_EditDirectorySection">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- ID Value: Directory Section -->
+            <input id="hidDirectorySectionId" type="hidden" />
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Directory Section</h5>
+
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="svg-icon svg-icon-2x"></span>
+                </div>
+                <!--end::Close-->
+            </div>
+                <div class="modal-body">
+                        <!-- Directory Section Name-->
+                        <div class="row mb-5">
+                            <div class="col-lg-1"></div>
+                            <label class="col-lg-3 col-form-label">Name:</label>
+                            <div class=" col-lg-6">
+                                <input id="txtEditDirectorySectionName" name="EditDirectorySectionName" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <!-- Directory Section Description-->
+                        <div class="row mb-5">
+                            <div class="col-lg-1"></div>
+                            <label class="col-lg-3 col-form-label">Description:</label>
+                            <div class="col-lg-6">
+                                <input id="txtEditDirectorySectionDescription" name="EditDirectorySectionDescription" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <!-- Directory Section Code-->
+                        <div class="row mb-5">
+                            <div class="col-lg-1"></div>
+                            <label class="col-lg-3 col-form-label">Code:</label>
+                            <div class=" col-lg-6">
+                                <input id="txtEditDirectorySectionCode" name="EditDirectorySectionCode" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <!-- Effective Date-->
+                        @*<div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Effective Date:</label>
+                            <div class=" col-lg-6">
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" name="NewDirectorySectionEffectiveDate"  placeholder="Select date" readonly id="dateNewDirectorySectionEffectiveDate" required />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="la la-calendar-check-o"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="form-text text-muted"></span>
+                            </div>
+                        </div>*@
+
+                        <!-- Checkboxes: Directory Type -->
+                        <div class="row mb-5">
+                            <label class="col-lg-1"></label>
+                            <div class="col-lg-3">Directory Type:</div>
+                            <div class="col-lg-2">
+                                <div class="kt-checkbox-single">
+                                    <label class="kt-checkbox kt-checkbox--bold">
+                                        <input id="chkEditOnline" name="chkEditOnline" type="checkbox" asp-for="chkEditOnline"/>
+                                        Online
+                                        <span></span>
+                                    </label>
+                                </div>
+                                <span class="form-text text-muted"></span>
+
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="kt-checkbox-single">
+                                    <label class="kt-checkbox kt-checkbox--bold">
+                                        <input id="chkEditPaper" name="chkEditPaper" type="checkbox" asp-for="chkEditPaper" />
+                                        Paper
+                                        <span></span>
+                                    </label>
+                                </div>
+                                <span class="form-text text-muted"></span>
+                            </div>
+                            <div class="col-lg-6">
+                            </div>
+                        </div>
+                </div>
+
+            <div class="modal-footer">
+                    <a id="btnUpdateDirectorySection" class="btn btn-success">
+                        <span class="kt-hidden-mobile" style="color:white;">Update</span>
+                    </a>
+                    <span class="kt-margin-left-right">
+                        <a id="btnCancelUpdateDirectorySection" class="btn btn-secondary">Cancel</a>
+                    </span>
+            </div>
+        </div>
+    </div>
+</div>

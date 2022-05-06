@@ -1,0 +1,18 @@
+﻿@model Portal.Common.ViewModels.SpecialtyCrosswalkViewModel
+<!-- begin:: Content -->
+<!--Begin::Row-->
+@section scripts
+{
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#ddlSpecialty").on("change", function () {
+                $("#SpecialtyCrosswalk_SpecialtyCode").val($('#ddlSpecialty').val().split('_')[1]);
+            });
+        });
+
+    </script>
+}
+
+@await Html.PartialAsync("partials/_crosswalk")
+<!--End::Row-->
+<!-- end:: Content -->

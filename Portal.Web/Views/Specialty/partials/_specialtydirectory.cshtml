@@ -1,0 +1,115 @@
+﻿@model Portal.Common.ViewModels.SpecialtyDirectoryViewModel
+@using Portal.Common.Enums
+
+@section scripts{
+    <script type="text/javascript">
+
+    </script>
+}
+
+
+
+<input asp-for="SpecialtyDemographics.SpecialtyId" />
+
+<input asp-for="SpecialtyDirectory.SpecialtyDirectoryId" id="hiddenSpecialtyDirectoryId" />
+
+<div class="container" id="SpecialtyDirectory">
+
+    <!-- begin::Directory Section title-->
+    <div class="row">
+        <h3 class="anchor fw-bolder mb-5" id="directory-section">
+         @(Model.ActionType == ActionType.Edit ? "Edit Directory Section" : "New Directory Section") 
+        </h3>
+    </div><!-- end::Directory Section title-->
+
+    <div class="row">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div id="DirectorySectionSqlError" class="kt-margin-b-20 text-danger col-lg-12"></div>
+        <div id="errorNoteDirectorySection" class="col-lg-12 kt-margin-b-20"></div>
+    </div>
+
+    <!-- begin::1st row controllers-->
+    <div class="row">
+        <div class="col fv-row">
+            <label for="ddlDirectorySectionLob">Line of Business</label>
+            <select id="ddlDirectorySectionLob" asp-for="SpecialtyDirectory.LineOfBusinessId"
+                asp-items="Model.SelectLineOfBusinesses" name="DirectorySectionLob"
+                class="form-control form-select" disabled="@(Model.ActionType == ActionType.Add ? null : "disabled")" required>
+                <option disabled></option>
+            </select> 
+         </div>
+        <div class="col fv-row">
+            <label for="ddlDirectorySectionCompany"> Company </label>
+            <select id="ddlDirectorySectionCompany" asp-for="SpecialtyDirectory.CompanyId" 
+                asp-items="Model.SelectCompanies" name="DirectorySectionCompany" 
+                class="form-select" disabled="disabled">
+                <option disabled></option>
+            </select>
+            <span class="form-text text-muted">Select Line of Business first.</span>
+        </div>
+        <div class="col fv-row">
+            <label for="ddlDirectoryType">Directory Type</label>
+            <select id="ddlDirectoryType" asp-for="SpecialtyDirectory.DirectoryTypeId" 
+                asp-items="Model.SelectDirectoryTypes" name="DirectorySectionType" class="form-select" 
+                disabled="@(Model.ActionType == ActionType.Add ? null : "disabled")">
+                    <option disabled></option>
+            </select>
+        </div>
+    </div><!-- end::1st row controllers-->
+    
+    <!-- begin::2nd row controllers-->
+    <div class="row">
+        <div class="col fv-row">
+            <label for="ddlDirectorySection"> Directory Section </label>
+            <select id="ddlDirectorySection" asp-for="SpecialtyDirectory.DirectorySectionId" asp-items="Model.SelectDirectorySection" name="DirectorySection" class="form-select" disabled="disabled">
+                <option disabled></option>
+            </select>
+            <span class="form-text text-muted">Select Directory Type first.</span>
+        </div>
+        <div class="col fv-row">
+            <label for="dateEffective">Effective Date</label>
+            <input asp-for="SpecialtyDirectory.EffectiveDate" name="DirectorySectionEffectiveDate" class="form-control" type="date" id="dateEffective" disabled="@(Model.ActionType == ActionType.Add? null : "disabled")" >
+        </div>
+        <div class="col fv-row">
+            <label for="dateEnd">End Date</label>
+            <input asp-for="SpecialtyDirectory.EndDate" class="form-control" name="DirectorySectionEndDate" type="date" id="dateEnd" disabled="@(Model.User.ModulePermission == PermissionType.edit ? null : "disabled")">
+        </div>
+    </div><!-- end::2nd row controllers-->
+
+    <div class="row">
+        <span asp-validation-for="SpecialtyDirectory.SpecialtyId" class="text-danger"></span>
+        <span asp-validation-for="SpecialtyDirectory.CompanyId" class="text-danger"></span>
+    </div>
+
+    <!-- begin::Footer-->
+    <div class="row">
+        <div class="col d-flex justify-content-end align-items-center">
+            <span class="kt-margin-left-right">
+                <a id="btnCancelSpecialtyDirectory" class="kt-link kt-font-bold">Cancel</a>
+            </span>
+
+            @{
+                if (Model.User.ModulePermission == PermissionType.edit)
+                {
+                    <a> &nbsp; or &nbsp; </a>
+                    if (Model.ActionType == ActionType.Edit)
+                        {
+                            <a id="btnSave" class="btn btn-primary btn-sm">
+                                <i class="la la-check"></i>
+                                <span class="kt-hidden-mobile" style="color:white;">Save</span>
+                            </a>
+                        }
+                    else
+                        {
+                            <button type="button" id="btnAdd" class="btn btn-primary btn-sm">
+                                <span class="kt-hidden-mobile" style="color:white;">Add</span>
+                            </button>
+                        }
+                }
+            }
+        </div>
+        
+
+    </div><!-- begin::Footer-->
+
+</div>

@@ -1,0 +1,5 @@
+﻿Febrero 28, 2022
+- Updated SpecialtyDirectory_Search to include UserRoleCompanyAccessId as parameter.
+
+Marzo 8, 2022
+- Updated SpecialtyLanguage_Search to include UserRoleCompanyAccessId as parameter.

@@ -1,0 +1,497 @@
+﻿@model Portal.Common.ViewModels.PermissionViewModel
+@using System.Security.Principal
+@using System.Security.Claims
+@using System.IdentityModel
+@using Portal.Common.Enums
+
+
+@section scripts{
+    <script type="text/javascript">
+
+        //$('#txtRoleModuleAccessDesc').keypress(function(event){
+        //    var str = $('#txtRoleModuleAccessDesc').val(); 
+
+        //if(String.fromCharCode(event.which) == ' '){
+        //    $('#txtRoleModuleAccessDesc').val(str.substring(0,str.length) + '_'); 
+        //    }
+        // }) 
+
+        $('#ddlSpecialty, #ddlPharmacy').select2({
+            placeholder: 'Select',
+            minimumResultsForSearch: -1
+
+        });
+
+        //Disable dropdowns.
+        $("#ddlSpecialty").attr('disabled', true);
+        $("#ddlPharmacy").attr('disabled', true);
+
+        //Manage Partialview onn Role Change.
+        //$('#ddlRole').select2({
+        //    minimumResultsForSearch: -1,
+        //    placeholder: 'Select a role',
+        //    data: [
+        //        //{
+        //        //    id: 1, //Enum.UserRole.Admin
+        //        //    text: 'Admin'
+        //        //},
+        //        {
+        //            id: 2, //Enum.UserRole.User
+        //            text: 'User'
+        //        },
+        //        {
+        //            id: 3, //Enum.UserRole.Reader
+        //            text: 'Reader'
+        //        }
+        //    ],
+        //}).on('change', function () {
+        //    $.ajax({
+        //        url: '../../Permission/GetRolePermissions/',
+        //        type: 'POST',
+        //        data: {
+        //            roleId: $('#ddlRole').val()
+        //        },
+        //        success: function (result) {
+        //            //Show partial view
+        //            //$('#PartialPlaceHolder').hide();
+        //            $('#PartialPlaceHolder').remove();
+        //            $('#Partial').show();
+        //            $('#Partial').html(result);
+
+        //            $(document).ready(function () {
+        //                $('#ddlSpecialty, #ddlPharmacy').select2({
+        //                    placeholder: 'Select',
+        //                    minimumResultsForSearch: -1
+
+        //                });
+        //            });
+
+        //        },
+        //        error: function (xhr) {
+        //            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+        //        }
+        //    });
+        //});
+
+        //$("#btnSave").click(function () {  // capture the click
+        //    $.ajax({
+        //        url: '../../Permission/SaveRolePermissions/',
+        //        data: {
+        //            roleId: $('#ddlRole').val(),
+        //            specialtyPermissionTypeId: $('#ddlSpecialty').val(),
+        //            pharmacyPermissionTypeId: $('#ddlPharmacy').val()
+        //        },
+        //        type: 'POST',
+        //        success: function (result) {
+        //            location.reload(true);
+        //        },
+        //        error: function (xhr) {
+        //            console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+        //        }
+        //    });
+        //});
+
+        $('#ddlNewRoleCompanyAccess').selectpicker();
+
+
+        $('#ddlRoleModuleAccess').selectpicker();
+
+        //Create: Role Module Access
+        $("#btnSaveNewRoleModuleAccess").click(function () {  // capture the click
+            $.ajax({
+                url: '../../Permission/CreateNewRoleModuleAccess/',
+                data: {
+                    newRoleName: $('#txtRoleModuleAccessDesc').val(),
+                    radProviderDirectory: $('input[name=radProviderDirectory]:checked').val(),
+                    radPharmacyDirectory: $('input[name=radPharmacyDirectory]:checked').val(),
+                    radDirectorySectionConfig: $('input[name=radPharmacyDirectory]:checked').val()
+                    
+                },
+                type: 'POST',
+                success: function (result) {
+                    location.reload(true);
+                },
+                error: function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                }
+            });
+        });
+
+        $("#btnSaveNewRoleCompanyAccess").click(function () {  // capture the click
+            $.ajax({
+                url: '../../Permission/CreateNewRoleCompanyAccess/',
+                data: {
+                    roleId: $('#ddlNewRoleCompanyAccess').val(),
+                    roleName: $('#ddlNewRoleCompanyAccess option:selected').text(),
+                    chkMMMFL: $('input[type=checkbox][name=chkMMMFL]:checked').val(),
+                    chkMMMMH: $('input[type=checkbox][name=chkMMMMH]:checked').val(),
+                    chkMMM: $('input[type=checkbox][name=chkMMM]:checked').val(),
+                    chkPMC: $('input[type=checkbox][name=chkPMC]:checked').val()
+                },
+                type: 'POST',
+                success: function (result) {
+                    location.reload(true);
+                },
+                error: function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                }
+            });
+        });
+
+        $("#btnUpdateRoleCompanyAccess").click(function () {  // capture the click
+            $.ajax({
+                url: '../../Permission/UpdateRoleCompanyAccess/',
+                data: {
+                    roleCompanyAccessId: $('#hidRoleCompanyAccessId').text(),
+                    chkRoleCompanyAccessIsActive: $('input[type=checkbox][name=chkRoleCompanyAccessIsActive]:checked').val()
+                },
+                type: 'POST',
+                success: function (result) {
+                    location.reload(true);
+                },
+                error: function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                }
+            });
+        });
+
+        //Button - Role Module Acces (Update)
+        $("#btnUpdateRoleModuleAccess").click(function () {  // capture the click
+            $.ajax({
+                url: '../../Permission/UpdateRoleModuleAccess/',
+                data: {
+                    rolePermissionId: $('#hidRolePermissionId').text(),
+                    permissionTypeId: $('#ddlRoleModuleAccess option:selected').val(),
+                },
+                type: 'POST',
+                success: function (result) {
+                    location.reload(true);
+                },
+                error: function (xhr) {
+                    console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr.responseText);
+                }
+            });
+        });
+    </script>
+    <script src="~/js/datatables/PermissionRoleCompanyAccess-Datatable.js" type="text/javascript"></script>
+    <script src="~/js/datatables/PermissionRoleModuleAccess-Datatable.js" type="text/javascript"></script>
+
+}
+
+
+
+
+    <div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid">
+        <div class="row">
+            <!--begin::Portlet-->
+            <div class="kt-portlet">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            Role-Module Permission
+                        </h3>
+                        <button type="button" class="btn btn-outline-success btn-sm kt-margin-l-20" data-toggle="modal" data-target="#modal_NewRoleModuleAccess">Add New</button>
+
+                    </div>
+                </div>
+                <!--begin::Form-->
+                <div class="kt-form kt-form--fit kt-form--label-right">
+                    <table class="kt-datatable" id="dtRoleModuleAccess"></table>
+                </div>
+
+                <!--end::Form-->
+            </div>
+            <!--end::Portlet-->
+
+
+        </div>
+        <div class="row">
+            <!--begin::Portlet-->
+            <div class="kt-portlet">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            Role-Company Access
+                        </h3>
+                        <button type="button" class="btn btn-outline-success btn-sm kt-margin-l-20" data-toggle="modal" data-target="#modal_NewRoleCompanyAccess">Add New</button>
+
+                    </div>
+                </div>
+                <!--begin::Form-->
+                <div class="kt-form kt-form--fit kt-form--label-right">
+                    <table class="kt-datatable" id="dtRoleCompanyAccess"></table>
+
+                </div>
+                <!--end::Form-->
+            </div>
+            <!--end::Portlet-->
+        </div>
+
+        <!-- MODAL: New RoleModuleAccess -->
+        <div class="modal fade" id="modal_NewRoleModuleAccess" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form method="post" class="kt-form kt-form--fit kt-form--label-right">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Role-Module Permission</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Role:</label>
+                                <div class="col-lg-6 ">
+                                    <input id="txtRoleModuleAccessDesc" class="form-control">
+                                    <span class="form-text text-muted">Enter the name for the new role.</span>
+                                </div>
+                            </div>
+
+                            <!-- Radio Group: Provider Directory-->
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Provider Directory:</label>
+                                <div class="col-lg-6 kt-radio-inline" style="padding: 0px 10px">
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radProviderDirectory" value="3"> None
+                                        <span></span>
+                                    </label>
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radProviderDirectory" value="1"> Read
+                                        <span></span>
+                                    </label>
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radProviderDirectory" value="2"> Edit
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Radio Group: Pharmacy Directory-->
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Pharmacy Directory:</label>
+                                <div class="col-lg-6 kt-radio-inline" style="padding: 0px 10px">
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radPharmacyDirectory" value="3"> None
+                                        <span></span>
+                                    </label>
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radPharmacyDirectory" value="1"> Read
+                                        <span></span>
+                                    </label>
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radPharmacyDirectory" value="2"> Edit
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+
+
+                            <!-- Radio Group: Directory Section Config -->
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Directory Section Config:</label>
+                                <div class="col-lg-6 kt-radio-inline" style="padding: 0px 10px">
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radDirectorySectionConfig" value="3"> None
+                                        <span></span>
+                                    </label>
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radDirectorySectionConfig" value="1"> Read
+                                        <span></span>
+                                    </label>
+                                    <label class="kt-radio">
+                                        <input type="radio" name="radDirectorySectionConfig" value="2"> Edit
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="btnSaveNewRoleModuleAccess" asp-controller="Permission" asp-action="SaveNewRoleModuleAccess" type="submit" class="btn btn-success" data-dismiss="modal">
+                                Create
+                            </button>
+
+                            @*<button asp-controller="Permission" asp-action="SaveNewRoleCompanyAccess" type="submit" class="btn btn-success">
+                                <span class="kt-hidden-mobile">Save</span>
+                            </button>*@
+                            <button type="reset" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: New RoleCompanyAccess -->
+        <div class="modal fade" id="modal_NewRoleCompanyAccess" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form method="post" class="kt-form kt-form--fit kt-form--label-right">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Rol-Company Access</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Role:</label>
+                                <div class="col-lg-6">
+                                    <select id="ddlNewRoleCompanyAccess" asp-items="Model.SelectRoles" class="form-control bootstrap-select">
+                                        <option hidden>Select</option>
+                                    </select>
+                                    <span class="form-text text-muted">Select a role to create it's company data access relationship.</span>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Company:</label>
+                                <div class="kt-checkbox-inline">
+                                    <div class="kt-checkbox">
+                                        <label class="kt-checkbox kt-checkbox--bold">
+                                            <input id="chkMMM" name="chkMMM" type="checkbox" asp-for="chkMMM" />
+                                            MMM
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                    <div class="kt-checkbox">
+                                        <label class="kt-checkbox kt-checkbox--bold">
+                                            <input id="chkMMMFL" name="chkMMMFL" type="checkbox" asp-for="chkMMMFL" />
+                                            MMMFL
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                    <div class="kt-checkbox">
+                                        <label class="kt-checkbox kt-checkbox--bold">
+                                            <input id="chkMMMMH" name="chkMMMMH" type="checkbox" asp-for="chkMMMMH" />
+                                            MMMMH
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                    <div class="kt-checkbox">
+                                        <label class="kt-checkbox kt-checkbox--bold">
+                                            <input id="chkPMC" name="chkPMC" type="checkbox" asp-for="chkPMC" />
+                                            PMC
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button id="btnSaveNewRoleCompanyAccess" asp-controller="Permission" asp-action="SaveNewRoleCompanyAccess" type="submit" class="btn btn-success" data-dismiss="modal">
+                                Create
+                            </button>
+
+                            @*<button asp-controller="Permission" asp-action="SaveNewRoleCompanyAccess" type="submit" class="btn btn-success">
+                                <span class="kt-hidden-mobile">Save</span>
+                            </button>*@
+                            <button type="reset" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MODAL: Edit RoleCompayAccess-->
+        <div class="modal fade" id="modal_EditRoleCompanyAccess" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form method="post" class="kt-form kt-form--fit kt-form--label-right">
+                        <input id="hidRoleCompanyAccessId" asp-for="RoleCompanyAccessId" type="hidden" />
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Role-Company Access</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Role Company Access-->
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Role Company Access:</label>
+                                <div class=" col-lg-6">
+                                    <input id="txtRoleCompanyAccessDesc" disabled class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-lg-3 col-form-label">Access:</label>
+                                <div class="col-sm-2 col-lg-6">
+                                    <div class="kt-checkbox-single kt-padding-t-5">
+                                        <label class="kt-checkbox kt-checkbox--bold ">
+                                            <input id="chkRoleCompanyAccessIsActive" name="chkRoleCompanyAccessIsActive" type="checkbox" asp-for="chkRoleCompanyAccessIsActive" />
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+
+                        <div class="modal-footer">
+                            <button id="btnUpdateRoleCompanyAccess" asp-controller="Permission" asp-action="UpdateRoleCompanyAccess" type="submit" class="btn btn-success" data-dismiss="modal">
+                                Save
+                            </button>
+
+                            @*<button asp-controller="Permission" asp-action="SaveNewRoleCompanyAccess" type="submit" class="btn btn-success">
+                                <span class="kt-hidden-mobile">Save</span>
+                            </button>*@
+                            <button type="reset" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Edit RoleModuleAccess -->
+        <div class="modal fade" id="modal_EditRoleModuleAccess" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form method="post" class="kt-form kt-form--fit kt-form--label-right">
+                        <input id="hidRolePermissionId" asp-for="RolePermissionId" type="hidden" />
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Role-Module Permission</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @*<div class="dropdown bootstrap-select form-control">*@
+                            <!-- lblRole -->
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Role:</label>
+                                <div class=" col-lg-6">
+                                    @*<label id="txtRoleModuleAccessRoleDesc" class="form-control form-control-md form-control-solid" disabled="disabled"> </label>*@
+                                    <input id="txtRoleModuleAccessRoleDesc" disabled class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- lblModule -->
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Module:</label>
+                                <div class="col-lg-6">
+                                    <input id="txtRoleModuleAccessModuleDesc" disabled class="form-control">
+
+                                </div>
+                            </div>
+
+                            <!-- ddlAccess -->
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Permission:</label>
+                                <div class="col-lg-6">
+                                    <select id="ddlRoleModuleAccess" asp-items="Model.SelectPermissions" class="form-control bootstrap-select">
+                                        <option hidden>Select</option>
+
+                                    </select>
+                                    <span class="form-text text-muted">Choose access level for selected role.</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button id="btnUpdateRoleModuleAccess" asp-controller="Permission" asp-action="UpdateRoleModuleAccess" type="submit" class="btn btn-success" data-dismiss="modal">
+                                Save
+                            </button>
+                            <button type="reset" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

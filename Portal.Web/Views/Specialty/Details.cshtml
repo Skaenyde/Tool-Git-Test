@@ -1,0 +1,667 @@
+﻿@model Portal.Common.ViewModels.SpecialtyCrosswalkViewModel
+<!-- begin:: Content -->
+<!--Begin::Row-->
+@*@await Html.PartialAsync("partials/_crosswalk")*@
+<!--End::Row-->
+<!-- end:: Content -->
+@*@model Portal.Common.ViewModels.SpecialtyCrosswalkViewModel*@
+@using Portal.Common.Enums
+
+
+
+@section css{
+<link href="~/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css">
+@*
+<link href="~/css/plugins/select2.css" rel="stylesheet" type="text/css">*@
+
+}
+
+@section vendors {
+<script src="~/assets/plugins/custom/datatables/datatables.bundle.js" type="text/javascript"></script>
+
+}
+
+@section scripts {
+<script src="~/js/datatables/SpecialtyLanguage-Datatable.js"></script>
+<script src="~/js/datatables/SpecialtyDirectory-Datatable.js"></script>
+<script src="~/js/plugins/moment.min.js" type="text/javascript"></script>
+<script src="~/js/plugins/datetime.js" type="text/javascript"></script>
+<script src="~/js/plugins/select2.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    //Show the Add Directory Section panel and hide the Directory Section List
+    $('#btnAddDirectorySection').click(function () {
+        $.ajax({
+            url: '../../Specialty/AddNewDirectorySection/',
+            type: 'POST',
+            success: function (result) {
+                //Switch partial views
+                $('#Partial').html(result);
+                $('#SpecialtyDirectoryList').hide();
+                $('#SpecialtyLanguageArea').hide();
+
+                //Hide "Add New button" when adding a new one.
+                $('#btnAddDirectorySection').hide();
+
+                //Cancel button events.
+                $('#btnCancelSpecialtyDirectory').click(function () {
+                    $('#SpecialtyDirectory').hide();
+                    $('#SpecialtyDirectoryList').show();
+                    $('#SpecialtyLanguageArea').show();
+
+                    //Show "Add new" Directory Section button on cancel.
+                    $('#btnAddDirectorySection').show();
+
+                });
+
+                //Clear and initialize Dropdowns
+                $('#ddlDirectorySectionCompany').val(null);
+                $('#ddlDirectorySectionLob').val(null);
+                $('#ddlDirectorySection').val(null);
+                $('#ddlDirectoryType').val(null);
+
+                $('#ddlDirectorySectionCompany').select2({
+                    placeholder: 'Select',
+                    minimumResultsForSearch: -1
+                });
+                $('#ddlDirectoryType').select2({
+                    placeholder: 'Select',
+                    minimumResultsForSearch: -1
+                }).on("change", function (e) {
+                    //Enable Company dropdown.
+                    $("#ddlDirectorySection").prop("disabled", false);
+                    $("#ddlDirectorySection").val(null);
+                    $('#ddlDirectorySection').select2({
+                        placeholder: 'Select',
+                        minimumResultsForSearch: -1,
+                        ajax: {
+                            url: '../../Specialty/GetDirectorySectionByDirectoryType/',
+                            dataType: 'json',
+                            //type: "GET",
+                            //delay: 250,
+                            //quietMillis: 100,
+                            data: function (params) {
+                                return {
+                                    directoryType: $('#ddlDirectoryType').val()
+                                };
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: $.map(data, function (obj) {
+                                        return {
+                                            id: obj.DirectorySectionId,
+                                            text: obj
+                                                .DirectorySectionName
+                                        };
+                                    })
+                                };
+                            },
+                            cache: false
+                        }
+                    });
+                });
+
+
+                $('#ddlDirectorySection').select2({
+                    placeholder: 'Select',
+                    minimumResultsForSearch: -1
+                });
+                $('#ddlDirectorySectionLob').select2({
+                    placeholder: 'Select',
+                    minimumResultsForSearch: -1
+                }).on("change", function (e) {
+                    //Enable Company dropdown.
+                    $("#ddlDirectorySectionCompany").prop("disabled", false);
+                    $("#ddlDirectorySectionCompany").val(null);
+                    $('#ddlDirectorySectionCompany').select2({
+                        placeholder: 'Select',
+                        minimumResultsForSearch: -1,
+                        ajax: {
+                            url: '../../Specialty/GetCompanyByLob/',
+                            dataType: 'json',
+                            //type: "GET",
+                            //delay: 250,
+                            //quietMillis: 100,
+                            data: function (params) {
+                                return {
+                                    lobId: $('#ddlDirectorySectionLob').val()
+                                };
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: $.map(data, function (obj) {
+                                        return {
+                                            id: obj.companyId,
+                                            text: obj.companyCode
+                                        };
+                                    })
+                                };
+                            },
+                            cache: false
+                        }
+                    });
+                });
+
+                //Directory Section form valdation rules and messages.
+                //Get that Form.
+                const directorySectionform = document.getElementById('formDirectorySection');
+
+                var directorySectionValidator = FormValidation.formValidation(
+                    directorySectionform,
+                    {
+                        fields: {
+                            'DirectorySection': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Directory section is required.'
+                                    }
+                                }
+                            },
+                            'DirectorySectionLob': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Line of business is required.'
+                                    }
+                                }
+                            },
+                            'DirectorySectionCompany': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Company is required.'
+                                    }
+                                }
+                            },
+                            'DirectorySectionType': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Type is required.'
+                                    }
+                                }
+                            },
+                            'DirectorySectionEffectiveDate': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Effective date is required.'
+                                    }
+                                }
+                            },
+                            'DirectorySectionEndDate': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'End date is required.'
+                                    }
+                                }
+                            },
+                        },
+
+                        plugins: {
+                            trigger: new FormValidation.plugins.Trigger(),
+                            bootstrap: new FormValidation.plugins.Bootstrap5({
+                                rowSelector: '.fv-row',
+                                eleInvalidClass: '',
+                                eleValidClass: ''
+                            })
+                        }
+                    }
+                );
+
+
+                $("#btnAdd").click(function () { // capture the click
+                    if (directorySectionValidator) {
+                        directorySectionValidator.validate().then(function (status) {
+                        console.log('validated!');
+
+                            if (status == 'Valid') {
+                                    $.ajax({
+                                        url: '../../Specialty/CreateSpecialtyDirectory/',
+                                        data: {
+                                            specialtyId: $('#hiddenSpecialtyId').val(),
+                                            directorySectionId: $('#ddlDirectorySection').val(),
+                                            companyId: $('#ddlDirectorySectionCompany').val(),
+                                            lineOfBusinessId: $('#ddlDirectorySectionLob')
+                                                .val(),
+                                            directoryTypeId: $('#ddlDirectoryType').val(),
+                                            endDate: $('#dateEnd').val(),
+                                            effectiveDate: $('#dateEffective').val()
+                                        },
+                                        type: 'POST',
+                                        success: function (result) {
+
+                                            location.reload(true);
+
+
+                                        },
+                                        error: function (xhr) {
+
+                                            $('#DirectorySectionSqlError').show();
+                                            $("#DirectorySectionSqlError").html(
+                                                ''); //Clear existing SQL error  messages.
+                                            $("#DirectorySectionSqlError").append(xhr
+                                                .responseText);
+                                            console.log('error : ' + xhr.status + ' - ' +
+                                                xhr.statusText + ' - ' + xhr
+                                                .responseText);
+                                        }
+                                    });
+                            }
+                            else {
+                                console.log('Invalid Form!');
+                            }
+                        });
+                    }
+                });
+            },
+            error: function (xhr) {
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr
+                    .responseText);
+            }
+        });
+    });
+
+    //Show the Add Language panel and hide the Specialty Language List
+    $('#btnAddNewSpecialtyLanguage').click(function () {
+
+        $.ajax({
+            url: '../../Specialty/AddNewSpecialtyLanguage/',
+            type: 'POST',
+            success: function (result) {
+                //Switch partials
+                $('#SpecialtyLanguageList').hide();
+                $('#DirectorySectionArea').hide();
+                $('#PartialSpecialtyLanguageList').html(result);
+
+                //Hide "Add New" button when adding a new Specialty Language.
+                $('#btnAddNewSpecialtyLanguage').hide();
+
+                //Cancel button events.
+                $('#btnSpecialtyLanguageCancel').click(function () {
+                    $('#SpecialtyLanguage').hide();
+                    $('#SpecialtyLanguageList').show();
+                    $('#DirectorySectionArea').show();
+                    $('#btnAddNewSpecialtyLanguage')
+                        .show(); //Show "Add New" Specialty Language button.
+                });
+
+
+
+                //Clear and initialize Dropdowns
+                $('#ddlSpecialtyLanguageCompany').val(null);
+                $('#ddlSpecialtyLanguageLob').val(null);
+                $('#ddlSpecialtyLanguage').val(null);
+
+                $('#ddlSpecialtyLanguageCompany').select2({
+                    placeholder: 'Select',
+                    minimumResultsForSearch: -1
+                });
+                $('#ddlSpecialtyLanguage').select2({
+                    placeholder: 'Select',
+                    minimumResultsForSearch: -1
+                });
+                $('#ddlSpecialtyLanguageLob').select2({
+                    placeholder: 'Select',
+                    minimumResultsForSearch: -1
+                }).on("change", function (e) {
+                    //Enable Company dropdown.
+                    $("#ddlSpecialtyLanguageCompany").prop("disabled", false);
+                    $("#ddlSpecialtyLanguageCompany").val(null);
+                    $('#ddlSpecialtyLanguageCompany').select2({
+                        placeholder: 'Select',
+                        minimumResultsForSearch: -1,
+                        ajax: {
+                            url: '../../Specialty/GetCompanyByLob/',
+                            dataType: 'json',
+                            //type: "GET",
+                            //delay: 250,
+                            //quietMillis: 100,
+                            data: function (params) {
+                                return {
+                                    lobId: $('#ddlSpecialtyLanguageLob').val()
+                                };
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: $.map(data, function (obj) {
+                                        return {
+                                            id: obj.companyId,
+                                            text: obj.companyCode
+                                        };
+                                    })
+                                };
+                            },
+                            cache: false
+                        }
+                    });
+                });
+
+                //Specialty Language form valdation rules and messages.
+                //Get that form.
+                const specialtyLanguageform = document.getElementById('formSpecialtyLanguage');
+
+                var specialtyLanguageValidator = FormValidation.formValidation(
+                    specialtyLanguageform,
+                    {
+                        fields: {
+                            'SpecialtyLanguage': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Language is required.'
+                                    }
+                                }
+                            },
+                            'SpecialtyLoB': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Line of business is required.'
+                                    }
+                                }
+                            },
+                            'SpecialtyCompany': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Company is required.'
+                                    }
+                                }
+                            },
+                            'SpecialtyDisplayName': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Display name is required.'
+                                    }
+                                }
+                            },
+                            'SpecialtyEffectiveDate': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Effective date is required.'
+                                    }
+                                }
+                            },
+                            'SpecialtyEndDate': {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'End date is required.'
+                                    }
+                                }
+                            },
+                        },
+
+                        plugins: {
+                            trigger: new FormValidation.plugins.Trigger(),
+                            bootstrap: new FormValidation.plugins.Bootstrap5({
+                                rowSelector: '.fv-row',
+                                eleInvalidClass: '',
+                                eleValidClass: ''
+                            })
+                        }
+                    }
+                );
+
+                $("#btnAddSpecialtyLanguage").click(function () { // capture the click
+                    if (specialtyLanguageValidator) {
+                        specialtyLanguageValidator.validate().then(function (status) {
+                            console.log('validated!');
+
+                            if (status == 'Valid') {
+                                    $.ajax({
+                                        url: '../../Specialty/CreateSpecialtyLanguage/',
+                                        data: {
+                                            specialtyId: $('#hiddenSpecialtyId').val(),
+                                            languageId: $('#ddlSpecialtyLanguage').val(),
+                                            companyId: $('#ddlSpecialtyLanguageCompany').val(),
+                                            lineOfBusinessId: $('#ddlSpecialtyLanguageLob')
+                                                .val(),
+                                            effectiveDate: $('#dateSpecialtyLanguageEffective')
+                                                .val(),
+                                            endDate: $('#dateSpecialtyLanguageEnd').val(),
+                                            specialtyDisplayName: $(
+                                                '#txtSpecialtyLanguageDisplayName').val()
+                                        },
+                                        type: 'POST',
+                                        success: function (result) {
+                                            location.reload(true);
+                                        },
+                                        error: function (xhr) {
+                                            $('#SpecialtyLanguageSqlError').show();
+                                            $("#SpecialtyLanguageSqlError").html(
+                                                ''); //Clear existing SQL error 
+                                            $("#SpecialtyLanguageSqlError").append(xhr
+                                                .responseText);
+                                            console.log('error : ' + xhr.status + ' - ' +
+                                                xhr.statusText + ' - ' + xhr
+                                                .responseText);
+                                        }
+                                    });
+                            }
+                            else {
+                                console.log('Invalid Form!');
+                            }
+                        });
+                    }
+                });
+            },
+            error: function (xhr) {
+
+                console.log('error : ' + xhr.status + ' - ' + xhr.statusText + ' - ' + xhr
+                    .responseText);
+            }
+        });
+
+    });
+</script>
+}
+
+
+
+<!-- begin::Content -->
+@* <h1>Specialty: @Model.SpecialtyDemographics.SpecialtyName</h1> *@
+<input asp-for="SpecialtyDemographics.SpecialtyId" id="hiddenSpecialtyId" />
+
+<!-- begin::1st Card -->
+<div class="card mb-2">
+    <!--begin::Card Body-->
+    <div class="card-body fs-6 py-10 px-10 px-lg-15 text-gray-700">
+        <!-- begin::Section -->
+        <div class="py-0">
+            <!-- begin::Specialty Title -->
+            <h1 class="anchor fw-bolder mb-5" id="specialty-name">
+                <a href="#provider-directory"></a>
+                @Model.SpecialtyDemographics.SpecialtyName
+            </h1> <!-- end::Specialty Title -->
+
+            <div class="separator mt-5 mb-5"></div>
+
+            <!-- begin::Demographics block -->
+            <div class="py-5">
+                <h5 class="mb-9">Demographics</h5>
+                <div class="d-flex flex-row mb-5">
+                    <div class="flex-equal">
+                        <table class="table table-flush fw-bold gy-1">
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted min-w-125px w-125px">QNXT Specialty</td>
+                                    <td class="text-gray-800">@Model.SpecialtyDemographics.SpecialtyName</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex-equal">
+                        <table class="table table-flush fw-bold gy-1">
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted min-w-125px w-125px">QNXT Specialty</td>
+                                    <td class="text-gray-800">@Model.SpecialtyDemographics.SpecialtyName</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div><!-- end::Demographics block -->
+
+            <!-- begin::Filters -->
+            <h5 class="mb-9">Filters</h5>
+            <div clas="container">
+                <div class="row gap-2">
+                    <div class="col">
+                        <select id="ddlCompany" asp-for="SpecialtyCrosswalk.CompanyId" asp-items="Model.SelectCompanies"
+                            class="form-select form-select-solid" data-allow-clear="true" data-control="select2"
+                            data-hide-search="true" data-placeholder="Company" data-specialty-details-filter="Company"
+                            disabled="@(Model.ActionType == ActionType.Add ? null : " disabled")">
+                            <option></option>
+                        </select>
+                        <span asp-validation-for="SpecialtyCrosswalk.CompanyId" class="text-danger"></span>
+                    </div>
+                    <div class="col">
+                        <select id="ddlLob" asp-for="SpecialtyCrosswalk.LineOfBusinessId"
+                            asp-items="Model.SelectLineOfBusinesses" class="form-select form-select-solid"
+                            data-allow-clear="true" data-control="select2" data-hide-search="true"
+                            data-placeholder="Line of Business" data-specialty-details-filter="LineOfBusiness"
+                            disabled="@(Model.ActionType == ActionType.Add ? null : " disabled")">
+                            <option></option>
+                        </select>
+                        <span asp-validation-for="SpecialtyCrosswalk.LineOfBusinessId" class="text-danger"></span>
+                    </div>
+                    <div class="col">
+                        <select id="ddlLanguage" asp-for="SpecialtyCrosswalk.LanguageId"
+                            asp-items="Model.SelectLanguages" class="form-select form-select-solid"
+                            data-allow-clear="true" data-control="select2" data-hide-search="true"
+                            data-placeholder="Language" data-specialty-details-filter="Language"
+                            disabled="@(Model.ActionType == ActionType.Add ? null : " disabled")">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="ddlType" asp-for="SpecialtyCrosswalk.DirectoryType"
+                            asp-items="Model.SelectDirectoryTypes" class="form-select form-select-solid"
+                            data-allow-clear="true" data-control="select2" data-hide-search="true"
+                            data-placeholder="Directory Type" data-specialty-details-filter="DirectoryType"
+                            disabled="@(Model.ActionType == ActionType.Add ? null : " disabled")">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+                 <div class="row my-5">
+                    <div class="col">
+                        <div class="form-check form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox" id="chkActive" checked="checked" />
+                            <label class="form-check-label" for="chkActive">
+                                Show active entries
+                            </label>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <!-- end::Filters -->
+
+        </div> <!-- end::Section -->
+    </div> <!-- end::Card Body -->
+</div> <!-- end::1st Card -->
+
+<!-- begin::2nd Card -->
+<div id="DirectorySectionArea" class="card mb-2">
+    <!--begin::Card Body-->
+    <div class="card-body fs-6 py-15 px-10 py-lg-15 px-lg-15 text-gray-700">
+        <!-- begin::Section -->
+        <div class="py-0">
+            <!-- begin::Directory Section Title -->
+            <div class="container px-0">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <h3 class="anchor fw-bolder mb-5" id="directory-section">
+                            <a href="#directory-section"></a>
+                            Directory Section
+                        </h3>
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <span>
+                            &nbsp;
+                            @{if (Model.User.ModulePermission == PermissionType.edit)
+                            {
+                            <button id="btnAddDirectorySection" type="button" class="btn btn-light-success btn-sm">
+                                Add new
+                            </button>
+                            }}
+                        </span>
+                    </div>
+                </div>
+            </div> <!-- end::Directory Section Title -->
+
+            <!-- begin::Directory Section Datatable -->
+            <div class="py-5">
+                <div class="kt-section__body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            @await Html.PartialAsync("partials/_specialtydirectory-list")
+                        </div>
+                    </div>
+
+                    <form id="formDirectorySection" method="post">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <div id="Partial"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div><!-- end::Directory Section Datatable -->
+
+
+        </div> <!-- end::Section -->
+    </div> <!-- end::Card Body -->
+</div> <!-- end::2st Card -->
+
+
+<!-- begin::3nd Card -->
+<div id="SpecialtyLanguageArea" class="card mb-2">
+    <!--begin::Card Body-->
+    <div class="card-body fs-6 py-15 px-10 py-lg-15 px-lg-15 text-gray-700">
+        <!-- begin::Section -->
+        <div class="py-0">
+            <!-- begin::Specialty Display Name Title -->
+            <div class="container px-0">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <h3 class="anchor fw-bolder mb-5" id="specialty-display-name">
+                            <a href="#specialty-display-name"></a>
+                            Specialty Display Name
+                        </h3>
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                        <span>
+                            &nbsp;
+                            @{if (Model.User.ModulePermission == PermissionType.edit)
+                            {
+                            <button id="btnAddNewSpecialtyLanguage" type="button" class="btn btn-light-success btn-sm">
+                                Add new
+                            </button>
+                            }}
+                        </span>
+                    </div>
+
+
+                </div>
+            </div> <!-- end::Specialty Display Name Title -->
+
+            <!-- begin::Directory Section Datatable -->
+            <div class="py-5">
+                <div class="kt-section__body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            @await Html.PartialAsync("partials/_specialtylanguage-list")
+                        </div>
+                    </div>
+
+                    <form id="formSpecialtyLanguage" method="post">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <div id="PartialSpecialtyLanguageList"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- end::Directory Section Datatable -->
+
+
+        </div> <!-- end::Section -->
+    </div> <!-- end::Card Body -->
+</div> <!-- end::3st Card -->
+<!--end::Content-->

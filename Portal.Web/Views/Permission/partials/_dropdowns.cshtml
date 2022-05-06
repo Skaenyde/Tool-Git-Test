@@ -1,0 +1,21 @@
+﻿@model Portal.Common.ViewModels.PermissionViewModel
+@using Portal.Common.Enums
+
+    <label class="col-lg-2 col-form-label">Specialty:</label>
+    <div class="col-lg-3">
+        <select id="ddlSpecialty" asp-for="SpecialtyPermissionId" class="form-control bootstrap-select">
+            <option value="0">none</option>
+            <option value="1">read</option>
+            <option value="2">edit</option>
+        </select>
+        @*<span class="form-text text-muted">Please select a role to modify</span>*@
+    </div>
+    <label class="col-lg-2 col-form-label">Pharmacy:</label>
+    <div class="col-lg-3">
+        <select id="ddlPharmacy" asp-for="PharmacyPermissionId" class="form-control bootstrap-select">
+            <option value="0">none</option>
+            <option value="1">read</option>
+            <option value="2">edit</option>
+        </select>
+        @*<span class="form-text text-muted">Please select a role to modify</span>*@
+    </div>
